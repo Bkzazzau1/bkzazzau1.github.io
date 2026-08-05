@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import {
     Bot,
+    BrainCircuit,
+    ChevronDown,
     Crown,
     Gem,
     LayoutDashboard,
@@ -10,14 +12,19 @@ import {
     Search,
     Send,
     ShieldCheck,
+    ShoppingCart,
     ShoppingBag,
     Sparkles,
     Star,
     Truck,
+    Trash2,
     UserRound,
     X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import dressImage from "./assets/product-dress.png";
+import handbagImage from "./assets/product-handbag.png";
+import heelsImage from "./assets/product-heels.png";
 
 function Button({ children, className = "", size, variant, ...props }) {
   return (
@@ -45,6 +52,7 @@ const products = [
     category: "Fashion Dress",
     price: "₦58,000",
     rating: 4.9,
+    image: dressImage,
   },
   {
     id: 2,
@@ -52,6 +60,7 @@ const products = [
     category: "Scarf",
     price: "₦18,500",
     rating: 4.8,
+    image: dressImage,
   },
   {
     id: 3,
@@ -59,6 +68,7 @@ const products = [
     category: "Bags",
     price: "₦45,000",
     rating: 4.9,
+    image: handbagImage,
   },
   {
     id: 4,
@@ -66,6 +76,7 @@ const products = [
     category: "Gowns",
     price: "₦38,000",
     rating: 4.7,
+    image: dressImage,
   },
   {
     id: 5,
@@ -73,6 +84,7 @@ const products = [
     category: "Abaya",
     price: "₦52,000",
     rating: 4.9,
+    image: dressImage,
   },
   {
     id: 6,
@@ -80,6 +92,7 @@ const products = [
     category: "Kaftan",
     price: "₦48,500",
     rating: 4.8,
+    image: dressImage,
   },
   {
     id: 7,
@@ -87,6 +100,7 @@ const products = [
     category: "Corporate Wear",
     price: "₦42,000",
     rating: 4.6,
+    image: dressImage,
   },
   {
     id: 8,
@@ -94,6 +108,7 @@ const products = [
     category: "Shoes",
     price: "₦39,000",
     rating: 4.7,
+    image: heelsImage,
   },
   {
     id: 9,
@@ -101,6 +116,7 @@ const products = [
     category: "Accessories",
     price: "₦25,000",
     rating: 4.8,
+    image: handbagImage,
   },
 ];
 
@@ -250,7 +266,7 @@ function detectIntent(message) {
   return bestMatch;
 }
 
-function Header() {
+function Header({ cartCount }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -286,8 +302,16 @@ function Header() {
           </a>
         </nav>
 
-        <Button className="hidden rounded-2xl bg-[#D4AF37] px-5 text-black hover:bg-[#f0cc5a] md:inline-flex">
-          Shop Premium
+        <Button
+          onClick={() => document.querySelector("#products")?.scrollIntoView()}
+          className="hidden items-center gap-2 rounded-2xl bg-[#D4AF37] px-5 text-black hover:bg-[#f0cc5a] md:inline-flex"
+        >
+          <ShoppingCart size={17} /> Shop Premium
+          {cartCount > 0 && (
+            <span className="rounded-full bg-black px-2 py-0.5 text-xs text-[#D4AF37]">
+              {cartCount}
+            </span>
+          )}
         </Button>
 
         <button className="md:hidden" onClick={() => setOpen(!open)}>
@@ -309,7 +333,7 @@ function Header() {
   );
 }
 
-function Hero() {
+function Hero({ onTryChatbot, onAddToCart }) {
   return (
     <section id="home" className="relative overflow-hidden bg-black text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#D4AF3725,transparent_35%),radial-gradient(circle_at_bottom_left,#ffffff12,transparent_35%)]" />
@@ -338,11 +362,17 @@ function Hero() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button className="rounded-2xl bg-[#D4AF37] px-6 text-black shadow-lg shadow-[#D4AF37]/20 hover:bg-[#f0cc5a]">
+            <Button
+              onClick={() => document.querySelector("#products")?.scrollIntoView()}
+              className="rounded-2xl bg-[#D4AF37] px-6 text-black shadow-lg shadow-[#D4AF37]/20 hover:bg-[#f0cc5a]"
+            >
               Explore Collection
             </Button>
 
-            <Button className="rounded-2xl border border-[#D4AF37]/40 bg-transparent px-6 text-[#D4AF37] hover:bg-[#D4AF37]/10">
+            <Button
+              onClick={onTryChatbot}
+              className="rounded-2xl border border-[#D4AF37]/40 bg-transparent px-6 text-[#D4AF37] hover:bg-[#D4AF37]/10"
+            >
               Try Chatbot
             </Button>
           </div>
@@ -369,8 +399,12 @@ function Hero() {
                   </div>
                 </div>
 
-                <div className="mt-6 flex h-56 items-center justify-center rounded-[1.5rem] border border-[#D4AF37]/20 bg-gradient-to-br from-[#D4AF37]/20 via-black to-[#2b2107]">
-                  <ShoppingBag size={90} className="text-[#D4AF37]" />
+                <div className="mt-6 h-56 overflow-hidden rounded-[1.5rem] border border-[#D4AF37]/20 bg-black">
+                  <img
+                    src={dressImage}
+                    alt="Luxury Black Evening Dress"
+                    className="h-full w-full object-cover object-center"
+                  />
                 </div>
 
                 <div className="mt-5 flex items-center justify-between">
@@ -387,7 +421,10 @@ function Hero() {
                     </p>
                   </div>
 
-                  <Button className="rounded-2xl bg-[#D4AF37] text-black hover:bg-[#f0cc5a]">
+                  <Button
+                    onClick={() => onAddToCart(products[0])}
+                    className="rounded-2xl bg-[#D4AF37] text-black hover:bg-[#f0cc5a]"
+                  >
                     Add to Cart
                   </Button>
                 </div>
@@ -445,7 +482,7 @@ function ServiceHighlights() {
   );
 }
 
-function Products() {
+function Products({ onAddToCart }) {
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -491,10 +528,11 @@ function Products() {
               className="group overflow-hidden rounded-[1.7rem] border border-[#D4AF37]/20 bg-[#111111] shadow-lg shadow-black/40 transition hover:-translate-y-1 hover:border-[#D4AF37]/60 hover:shadow-[#D4AF37]/10"
             >
               <CardContent className="p-4">
-                <div className="flex h-48 items-center justify-center rounded-[1.3rem] border border-[#D4AF37]/20 bg-gradient-to-br from-[#D4AF37]/20 via-[#111111] to-black">
-                  <ShoppingBag
-                    size={64}
-                    className="text-[#D4AF37] transition group-hover:scale-110"
+                <div className="h-48 overflow-hidden rounded-[1.3rem] border border-[#D4AF37]/20 bg-black">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 </div>
 
@@ -522,7 +560,10 @@ function Products() {
                       {product.price}
                     </p>
 
-                    <Button className="rounded-2xl bg-[#D4AF37] text-black hover:bg-[#f0cc5a]">
+                    <Button
+                      onClick={() => onAddToCart(product)}
+                      className="rounded-2xl bg-[#D4AF37] text-black hover:bg-[#f0cc5a]"
+                    >
                       Add to Cart
                     </Button>
                   </div>
@@ -536,16 +577,18 @@ function Products() {
   );
 }
 
-function ChatbotWidget() {
-  const [open, setOpen] = useState(true);
+const welcomeMessage = {
+  sender: "bot",
+  text: "Hello, welcome to Shemar Collection. Ask me about women clothes, scarves, bags, dresses, delivery, payment, returns, order tracking or customer support.",
+  intent: "greeting",
+};
+
+function ChatbotWidget({ open, setOpen }) {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      sender: "bot",
-      text: "Hello, welcome to Shemar Collection. Ask me about women clothes, scarves, bags, dresses, delivery, payment, returns, order tracking or customer support.",
-      intent: "greeting",
-    },
-  ]);
+  const [messages, setMessages] = useState([welcomeMessage]);
+  const [typing, setTyping] = useState(false);
+  const [showSamples, setShowSamples] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const sampleMessages = [
     "What products do you sell?",
@@ -568,15 +611,23 @@ function ChatbotWidget() {
 
     const userMessage = { sender: "user", text: cleanMessage };
     const result = detectIntent(cleanMessage);
-    const botMessage = {
-      sender: "bot",
-      text: result.answer,
-      intent: result.intent,
-    };
-
-    setMessages((prev) => [...prev, userMessage, botMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setMessage("");
+    setTyping(true);
+    setShowSamples(false);
+
+    window.setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: result.answer, intent: result.intent },
+      ]);
+      setTyping(false);
+    }, 650);
   };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, typing, open]);
 
   return (
     <div id="support" className="fixed bottom-5 right-5 z-50">
@@ -584,7 +635,7 @@ function ChatbotWidget() {
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="mb-4 w-[92vw] max-w-sm overflow-hidden rounded-[1.7rem] border border-[#D4AF37]/30 bg-black shadow-2xl shadow-[#D4AF37]/20"
+          className="mb-2 flex max-h-[calc(100vh-2rem)] w-[calc(100vw-1.5rem)] max-w-sm flex-col overflow-hidden rounded-[1.7rem] border border-[#D4AF37]/30 bg-black shadow-2xl shadow-[#D4AF37]/20 sm:mb-4 sm:max-h-[calc(100vh-3rem)] sm:w-[92vw]"
         >
           <div className="flex items-center justify-between bg-[#090909] px-5 py-4 text-white">
             <div className="flex items-center gap-3">
@@ -600,15 +651,26 @@ function ChatbotWidget() {
               </div>
             </div>
 
-            <button
-              onClick={() => setOpen(false)}
-              className="rounded-full p-1 hover:bg-white/10"
-            >
-              <X size={18} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setMessages([welcomeMessage])}
+                className="rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-[#D4AF37]"
+                aria-label="Clear conversation"
+                title="Clear conversation"
+              >
+                <Trash2 size={17} />
+              </button>
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded-full p-2 hover:bg-white/10"
+                aria-label="Close chatbot"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
-          <div className="h-80 space-y-3 overflow-y-auto bg-[#111111] p-4">
+          <div className="min-h-40 flex-1 space-y-3 overflow-y-auto bg-[#111111] p-4 sm:h-72 sm:flex-none">
             {messages.map((item, index) => (
               <div
                 key={index}
@@ -633,21 +695,49 @@ function ChatbotWidget() {
                 </div>
               </div>
             ))}
+            {typing && (
+              <div className="flex justify-start">
+                <div className="flex items-center gap-1 rounded-2xl border border-[#D4AF37]/20 bg-black px-4 py-3">
+                  {[0, 1, 2].map((dot) => (
+                    <motion.span
+                      key={dot}
+                      className="h-2 w-2 rounded-full bg-[#D4AF37]"
+                      animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+                      transition={{ duration: 0.8, repeat: Infinity, delay: dot * 0.15 }}
+                    />
+                  ))}
+                  <span className="ml-2 text-xs text-neutral-400">Assistant is typing</span>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
 
           <div className="border-t border-[#D4AF37]/20 bg-black p-3">
-            <p className="mb-2 text-xs text-neutral-400">Try a sample question:</p>
-            <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
-              {sampleMessages.map((sample) => (
-                <button
-                  key={sample}
-                  onClick={() => sendMessage(sample)}
-                  className="shrink-0 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-xs text-[#D4AF37] transition hover:bg-[#D4AF37]/20"
-                >
-                  {sample}
-                </button>
-              ))}
-            </div>
+            <button
+              onClick={() => setShowSamples((value) => !value)}
+              className="mb-2 flex w-full items-center justify-between text-xs text-neutral-400 hover:text-[#D4AF37]"
+            >
+              Try a sample question
+              <ChevronDown
+                size={15}
+                className={`transition ${showSamples ? "rotate-180" : ""}`}
+              />
+            </button>
+            {showSamples && (
+              <div className="mb-3 grid max-h-28 gap-2 overflow-y-auto sm:grid-cols-2">
+                {sampleMessages.map((sample) => (
+                  <button
+                    key={sample}
+                    onClick={() => sendMessage(sample)}
+                    disabled={typing}
+                    className="rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-2 py-2 text-left text-[11px] text-[#D4AF37] transition hover:bg-[#D4AF37]/20 disabled:opacity-50"
+                  >
+                    {sample}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="flex items-center gap-2 rounded-2xl border border-[#D4AF37]/30 bg-[#111111] px-3 py-2">
               <input
                 value={message}
@@ -659,6 +749,7 @@ function ChatbotWidget() {
 
               <Button
                 onClick={sendMessage}
+                disabled={typing}
                 size="icon"
                 className="rounded-xl bg-[#D4AF37] text-black"
               >
@@ -687,7 +778,7 @@ function AdminPreview() {
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-8 max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wider text-[#D4AF37]">
-            Admin Demo
+            Admin Demo · Sample Data
           </p>
 
           <h2 className="mt-2 text-3xl font-black tracking-tight text-white md:text-4xl">
@@ -731,13 +822,62 @@ function AdminPreview() {
   );
 }
 
+function HowItWorks() {
+  const steps = [
+    { title: "Customer Question", text: "The customer enters a support request.", icon: MessageCircle },
+    { title: "Text Processing", text: "The message is normalized for analysis.", icon: BrainCircuit },
+    { title: "Intent Detection", text: "The demo identifies the closest customer-service intent.", icon: Search },
+    { title: "Knowledge Matching", text: "The intent is matched with the prepared knowledge base.", icon: LayoutDashboard },
+    { title: "Helpful Response", text: "A suitable customer-service answer is displayed.", icon: Bot },
+  ];
+
+  return (
+    <section id="how-it-works" className="border-y border-[#D4AF37]/15 bg-black px-4 py-16 text-white">
+      <div className="mx-auto max-w-7xl">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#D4AF37]">System Process</p>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">How the chatbot works</h2>
+          <p className="mt-4 leading-7 text-neutral-400">
+            The demonstration follows a simple NLP customer-support pipeline from question to response.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-5">
+          {steps.map((step, index) => (
+            <div key={step.title} className="relative rounded-3xl border border-[#D4AF37]/20 bg-[#111111] p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D4AF37] text-black">
+                  <step.icon size={20} />
+                </div>
+                <span className="text-2xl font-black text-[#D4AF37]/30">0{index + 1}</span>
+              </div>
+              <h3 className="font-bold">{step.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-neutral-400">{step.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function ShemarCollectionChatbotDemo() {
+  const [cartCount, setCartCount] = useState(0);
+  const [chatOpen, setChatOpen] = useState(true);
+  const [cartNotice, setCartNotice] = useState("");
+
+  const addToCart = (product) => {
+    setCartCount((count) => count + 1);
+    setCartNotice(`${product.name} added to cart`);
+    window.setTimeout(() => setCartNotice(""), 2200);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
-      <Header />
-      <Hero />
+      <Header cartCount={cartCount} />
+      <Hero onTryChatbot={() => setChatOpen(true)} onAddToCart={addToCart} />
       <ServiceHighlights />
-      <Products />
+      <Products onAddToCart={addToCart} />
+      <HowItWorks />
       <AdminPreview />
 
       <footer className="border-t border-[#D4AF37]/20 bg-black px-4 py-10 text-center text-sm text-neutral-500">
@@ -747,7 +887,16 @@ export default function ShemarCollectionChatbotDemo() {
         </p>
       </footer>
 
-      <ChatbotWidget />
+      {cartNotice && (
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed left-1/2 top-24 z-[60] -translate-x-1/2 rounded-2xl border border-[#D4AF37]/30 bg-[#111111] px-5 py-3 text-sm text-white shadow-2xl"
+        >
+          <span className="mr-2 text-[#D4AF37]">✓</span>{cartNotice}
+        </motion.div>
+      )}
+      <ChatbotWidget open={chatOpen} setOpen={setChatOpen} />
     </div>
   );
 }
