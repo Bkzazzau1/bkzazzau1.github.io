@@ -106,6 +106,12 @@ const products = [
 
 const knowledgeBase = [
   {
+    intent: "greeting",
+    keywords: ["hello", "hi", "hey", "good morning", "good afternoon"],
+    answer:
+      "Hello! Welcome to Shemar Collection. I can help you with products, delivery, payment, returns, order tracking and customer support.",
+  },
+  {
     intent: "delivery",
     keywords: [
       "delivery",
@@ -511,11 +517,22 @@ function ChatbotWidget() {
     },
   ]);
 
-  const sendMessage = () => {
-    if (!message.trim()) return;
+  const sampleMessages = [
+    "What products do you sell?",
+    "Do you deliver to Kaduna?",
+    "How can I make payment?",
+    "What is your return policy?",
+    "How do I track my order?",
+  ];
 
-    const userMessage = { sender: "user", text: message };
-    const result = detectIntent(message);
+  const sendMessage = (sampleMessage) => {
+    const cleanMessage = (
+      typeof sampleMessage === "string" ? sampleMessage : message
+    ).trim();
+    if (!cleanMessage) return;
+
+    const userMessage = { sender: "user", text: cleanMessage };
+    const result = detectIntent(cleanMessage);
     const botMessage = {
       sender: "bot",
       text: result.answer,
@@ -584,6 +601,18 @@ function ChatbotWidget() {
           </div>
 
           <div className="border-t border-[#D4AF37]/20 bg-black p-3">
+            <p className="mb-2 text-xs text-neutral-400">Try a sample question:</p>
+            <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+              {sampleMessages.map((sample) => (
+                <button
+                  key={sample}
+                  onClick={() => sendMessage(sample)}
+                  className="shrink-0 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-xs text-[#D4AF37] transition hover:bg-[#D4AF37]/20"
+                >
+                  {sample}
+                </button>
+              ))}
+            </div>
             <div className="flex items-center gap-2 rounded-2xl border border-[#D4AF37]/30 bg-[#111111] px-3 py-2">
               <input
                 value={message}
