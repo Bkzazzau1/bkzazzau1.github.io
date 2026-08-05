@@ -153,6 +153,36 @@ const knowledgeBase = [
       "Customers can track their orders by contacting support with their order number. The system can also provide order status updates when tracking is enabled.",
   },
   {
+    intent: "size_guide",
+    keywords: ["size", "sizes", "measurement", "measurements", "fit"],
+    answer:
+      "Our women’s clothing is available in different sizes. Please check the size guide for each item or send your bust, waist and hip measurements to customer support for assistance.",
+  },
+  {
+    intent: "stock_availability",
+    keywords: ["stock", "in stock", "out of stock", "still available"],
+    answer:
+      "Product availability is updated regularly. Please tell me the name of the item you want, and customer support can confirm its current colour and size availability.",
+  },
+  {
+    intent: "discount",
+    keywords: ["discount", "sale", "promo", "promotion", "coupon", "cheaper"],
+    answer:
+      "Shemar Collection offers discounts during selected promotions and seasonal sales. Follow our updates or contact customer support to learn about current offers.",
+  },
+  {
+    intent: "store_location",
+    keywords: ["shop location", "store location", "address", "visit", "physical shop"],
+    answer:
+      "You can contact Shemar Collection customer support for our current store address and directions before visiting the physical shop.",
+  },
+  {
+    intent: "business_hours",
+    keywords: ["opening", "closing", "business hours", "working hours", "open today", "what time"],
+    answer:
+      "Our customer support service is available Monday to Saturday from 9:00 AM to 6:00 PM. Messages received outside these hours will be answered on the next working day.",
+  },
+  {
     intent: "products",
     keywords: [
       "product",
@@ -523,6 +553,11 @@ function ChatbotWidget() {
     "How can I make payment?",
     "What is your return policy?",
     "How do I track my order?",
+    "What sizes do you have?",
+    "Is this item still available?",
+    "Do you offer any discounts?",
+    "Where is your physical shop?",
+    "What are your business hours?",
   ];
 
   const sendMessage = (sampleMessage) => {
