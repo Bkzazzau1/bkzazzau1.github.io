@@ -46,6 +46,10 @@ jobs:
         run: npm ci
         working-directory: shemar_source/shemar-chatbot-demo
 
+      - name: Test realistic chatbot conversations
+        run: npm test
+        working-directory: shemar_source/shemar-chatbot-demo
+
       - name: Build for the root GitHub Pages URL
         run: npm run build -- --base=/
         working-directory: shemar_source/shemar-chatbot-demo
