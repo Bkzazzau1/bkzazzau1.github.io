@@ -1,5 +1,5 @@
 name: Deploy Shemar Collection from source repository
-run-name: Publish Shemar premium UI from latest chatbot main
+run-name: Deploy updated Shemar Collection UI and responsive chat
 
 on:
   push:
