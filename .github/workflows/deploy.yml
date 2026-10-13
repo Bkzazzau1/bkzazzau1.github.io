@@ -50,6 +50,45 @@ jobs:
         run: npm test
         working-directory: shemar_source/shemar-chatbot-demo
 
+      - name: Check Gemini API response without exposing key
+        env:
+          SHEMAR_API_KEY: ${{ secrets.SHEMAR_GEMINI_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          import sys
+          key = os.environ.get("SHEMAR_API_KEY", "").strip()
+          if not key:
+              print("Gemini readiness: no temporary API key configured")
+              sys.exit(1)
+          url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
+          body = json.dumps({
+              "contents": [{"role": "user", "parts": [{"text": "Say hello in one short sentence."}]}],
+              "generationConfig": {"temperature": 0.1, "maxOutputTokens": 80}
+          }).encode()
+          request = urllib.request.Request(url, data=body, headers={
+              "Content-Type": "application/json",
+              "x-goog-api-key": key
+          }, method="POST")
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  data = json.load(response)
+              parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
+              if not any(isinstance(item.get("text"), str) and item["text"].strip() for item in parts):
+                  print("Gemini readiness: API returned no text response")
+                  sys.exit(1)
+              print("Gemini readiness: API generated a text response successfully")
+          except urllib.error.HTTPError as err:
+              print("Gemini readiness: HTTP", err.code)
+              sys.exit(1)
+          except Exception as err:
+              print("Gemini readiness: request failed:", type(err).__name__)
+              sys.exit(1)
+          PY
+
       - name: Build for the root GitHub Pages URL
         env:
           VITE_SHEMAR_GEMINI_API_KEY: ${{ secrets.SHEMAR_GEMINI_API_KEY }}
