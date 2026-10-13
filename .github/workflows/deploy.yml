@@ -51,6 +51,8 @@ jobs:
         working-directory: shemar_source/shemar-chatbot-demo
 
       - name: Build for the root GitHub Pages URL
+        env:
+          VITE_SHEMAR_GEMINI_API_KEY: ${{ secrets.SHEMAR_GEMINI_API_KEY }}
         run: npm run build -- --base=/
         working-directory: shemar_source/shemar-chatbot-demo
 
