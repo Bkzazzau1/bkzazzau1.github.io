@@ -1,5 +1,5 @@
 name: Deploy Shemar Collection from source repository
-run-name: Publish Shemar Concierge Gemini defence integration
+run-name: Publish automatic Gemini inside Shemar Concierge
 
 on:
   push:
